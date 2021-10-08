@@ -30,6 +30,9 @@ sbit PWM1=P3^1;
 sbit PWM2=P3^2;
 sbit PWM3=P3^3;
 
+sbit LED0=P0^0;
+uchar state4=0;
+
 // key0-key7定义舵机控制按键信号
 // 两个一组控制舵机位置加减
 sbit key0=P2^0;
@@ -46,12 +49,14 @@ sbit but0=P1^0;
 sbit but1=P1^1;
 sbit but2=P1^2;
 sbit but3=P1^3;
+sbit but4=P1^4;
 
 // 定义功能按键标志位
 uchar flag0=0;
 uchar flag1=0;
 uchar flag2=0;
 uchar flag3=0;
+uchar flag4=0;
 uchar flag0f=0;
 uchar flag1f=0;
 uchar flag2f=0;
@@ -273,20 +278,37 @@ void get_key() {
 	}
 	if(but2==1&&flag2==1) {
 		flag2=0;
-		motion00=servo0;
-		motion01=servo1;
-		motion02=servo2;
-		motion03=servo3;
+		if(state4==1) {
+			motion00=servo0;
+			motion01=servo1;
+			motion02=servo2;
+			motion03=servo3;
+		}
 	}
 	if(but3==0&&flag3==0) {
 		flag3=1;
 	}
-	if(but3==1&&flag3==1) {
+	if(but3==1&&flag3==1&&state4==1) {
 		flag3=0;
-		motion10=servo0;
-		motion11=servo1;
-		motion12=servo2;
-		motion13=servo3;
+		if(state4==1) {
+			motion10=servo0;
+			motion11=servo1;
+			motion12=servo2;
+			motion13=servo3;
+		}
+	}
+	if(but4==0&&flag4==0) {
+		flag4=1;
+	}
+	if(but4==1&&flag4==1) {
+		flag4=0;
+		if(state4==0) {
+			state4=1;
+			LED0=0;
+		} else {
+			state4=0;
+			LED0=1;
+		}	
 	}
 }
 
@@ -366,5 +388,10 @@ void main() {
 			turn(0,motion10);
 			flag1f=0;
 		}
+		// if(state4==1) {
+		// 	LED0=1;
+		// } else {
+		// 	LED0=0;
+		// }
     }
 }
