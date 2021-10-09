@@ -145,25 +145,25 @@ void turn(uchar iden, int target) {
 void turn_inf(uchar iden) {
 	switch (iden) {
 		case 0:
-			while(flag0x>0 && servo0 < 222) {
+			while(flag0x>0 && servo0 < 225) {
 				servo0++;
 				delay1();
 			}
 			break;
 		case 1:
-			while(flag2x>0 && servo1 < 222) {
+			while(flag2x>0 && servo1 < 225) {
 				servo1++;
 				delay1();
 			}
 			break;
 		case 2:
-			while(flag4x>0 && servo2 < 222) {
+			while(flag4x>0 && servo2 < 225) {
 				servo2++;
 				delay1();
 			}
 			break;
 		case 3:
-			while(flag6x>0 && servo3 < 222) {
+			while(flag6x>0 && servo3 < 225) {
 				servo3++;
 				delay1();
 			}
@@ -388,10 +388,5 @@ void main() {
 			turn(0,motion10);
 			flag1f=0;
 		}
-		// if(state4==1) {
-		// 	LED0=1;
-		// } else {
-		// 	LED0=0;
-		// }
     }
 }
