@@ -30,8 +30,8 @@ sbit PWM1=P3^1;
 sbit PWM2=P3^2;
 sbit PWM3=P3^3;
 
+// 定义LED状态指示灯信号输出
 sbit LED0=P0^0;
-uchar state4=0;
 
 // key0-key7定义舵机控制按键信号
 // 两个一组控制舵机位置加减
@@ -44,7 +44,7 @@ sbit key5=P2^5;
 sbit key6=P2^6;
 sbit key7=P2^7;
 // but0-but3定义功能按键信号
-// 0、1为开启动作组按键，2、3为动作组记忆使能按键
+// 0、1为开启动作组按键，2、3为动作组记忆使能按键，4为动作组记忆状态开关按键
 sbit but0=P1^0;
 sbit but1=P1^1;
 sbit but2=P1^2;
@@ -57,6 +57,7 @@ uchar flag1=0;
 uchar flag2=0;
 uchar flag3=0;
 uchar flag4=0;
+uchar state4=0;
 uchar flag0f=0;
 uchar flag1f=0;
 uchar flag2f=0;
@@ -91,7 +92,8 @@ void delay1() {
 	}
 }
 
-// 转动函数，iden为舵机识别号，target为目标数值
+// 转动函数，iden为舵机识别号，target为目标数值，
+// 在动作组中被调用
 void turn(uchar iden, int target) {
 	int servo;
 	int angle=0;
@@ -142,6 +144,8 @@ void turn(uchar iden, int target) {
 }
 
 // 转动函数，iden为舵机识别号
+// 按键点动控制舵机时调用
+// 225为舵机占空比的数值上限，调整可以限制舵机转动角度
 void turn_inf(uchar iden) {
 	switch (iden) {
 		case 0:
@@ -172,6 +176,8 @@ void turn_inf(uchar iden) {
 }
 
 // 反向转动函数，iden为舵机识别号
+// 按键点动控制舵机时调用
+// 42为舵机占空比的数值下限，调整可以限制舵机转动角度
 void reverse_inf(uchar iden) {
 	switch (iden) {
 		case 0:
@@ -221,6 +227,7 @@ void timer_int() {
 
 // 按键扫描函数
 void get_key() {
+	// 点动控制，不作消抖处理
 	// 控制舵机0
 	if(key0==0)
 		flag0x=1;
@@ -258,7 +265,7 @@ void get_key() {
 	if(key7==1)
 		flag7x=0;
 
-	// 控制状态开关
+	// 控制状态开关，使用标志位消除抖动
 	if(but0==0&&flag0==0) {
 		flag0=1;
 	}
@@ -278,6 +285,7 @@ void get_key() {
 	}
 	if(but2==1&&flag2==1) {
 		flag2=0;
+		// 当 state 被按下使状态指示灯亮起时，动作组可以被覆写
 		if(state4==1) {
 			motion00=servo0;
 			motion01=servo1;
@@ -290,6 +298,7 @@ void get_key() {
 	}
 	if(but3==1&&flag3==1&&state4==1) {
 		flag3=0;
+		// 当 state 被按下使状态指示灯亮起时，动作组可以被覆写
 		if(state4==1) {
 			motion10=servo0;
 			motion11=servo1;
@@ -302,6 +311,7 @@ void get_key() {
 	}
 	if(but4==1&&flag4==1) {
 		flag4=0;
+		// 通过标志位 state4 控制覆写功能开启或关闭，按下一次开启，再次按下关闭
 		if(state4==0) {
 			state4=1;
 			LED0=0;
